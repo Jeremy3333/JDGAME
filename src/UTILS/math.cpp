@@ -1,4 +1,4 @@
-#include "Math.hpp"
+#include "UTILS/Math.hpp"
 
 Vector2f::Vector2f() : x(0), y(0) {}
 

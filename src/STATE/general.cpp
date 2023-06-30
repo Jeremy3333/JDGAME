@@ -1,4 +1,4 @@
-#include "General.hpp"
+#include "STATE/General.hpp"
 
 General::General() : world(nullptr), state(STATE_START_MENU) {}
 

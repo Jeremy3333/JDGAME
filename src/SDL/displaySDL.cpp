@@ -1,4 +1,4 @@
-#include "DisplaySDL.hpp"
+#include "SDL/DisplaySDL.hpp"
 
 void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &quit, bool &keyHeld)
 {

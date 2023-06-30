@@ -1,4 +1,4 @@
-#include "Player.hpp"
+#include "GAME/Player.hpp"
 
 Player::Player(int P_characterID) : characterID(P_characterID) {}
 

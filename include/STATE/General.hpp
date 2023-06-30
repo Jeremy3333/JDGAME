@@ -1,6 +1,7 @@
 #pragma once
-#include "World.hpp"
-#include "Utils.hpp"
+
+#include "STATE/World.hpp"
+#include "UTILS/Utils.hpp"
 
 class General
 {

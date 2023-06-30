@@ -1,5 +1,6 @@
 #pragma once
-#include "Player.hpp"
+
+#include "GAME/Player.hpp"
 
 class World
 {

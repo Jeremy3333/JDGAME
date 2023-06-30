@@ -1,4 +1,4 @@
-#include "DisplaySDL.hpp"
+#include "SDL/DisplaySDL.hpp"
 
 int main(int argc, char *argv[])
 {
