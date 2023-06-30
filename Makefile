@@ -15,8 +15,8 @@ TARGET = bin/program.exe
 
 all: $(TARGET)
 
-$(TARGET): obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o
-	$(CC) $(CFLAGS) $(WINDOWFLAG) $(SDLDLL) $(SDLLIB) $(SDLFLAGS) $(INCLUDES) obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o -o $(TARGET)
+$(TARGET): obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o
+	$(CC) $(CFLAGS) $(WINDOWFLAG) $(SDLDLL) $(SDLLIB) $(SDLFLAGS) $(INCLUDES) obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o -o $(TARGET)
 
 # *****************************************************
 #main
@@ -33,8 +33,11 @@ obj/displaySDL.o: src/SDL/displaySDL.cpp include/SDL/DisplaySDL.hpp include/STAT
 # *****************************************************
 #STATE
 
-obj/general.o: src/STATE/general.cpp include/STATE/General.hpp include/STATE/World.hpp include/UTILS/Utils.hpp
+obj/general.o: src/STATE/general.cpp include/STATE/General.hpp include/STATE/StartMenu.hpp include/STATE/World.hpp include/UTILS/Utils.hpp
 	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/STATE/general.cpp -o obj/general.o
+
+obj/startMenu.o: src/STATE/startMenu.cpp include/STATE/StartMenu.hpp include/UTILS/Button.hpp include/UTILS/Utils.hpp
+	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/STATE/startMenu.cpp -o obj/startMenu.o
 
 obj/world.o: src/STATE/world.cpp include/STATE/World.hpp include/GAME/Player.hpp
 	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/STATE/world.cpp -o obj/world.o
@@ -44,6 +47,9 @@ obj/world.o: src/STATE/world.cpp include/STATE/World.hpp include/GAME/Player.hpp
 
 obj/math.o: src/UTILS/math.cpp include/UTILS/Math.hpp
 	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/UTILS/math.cpp -o obj/math.o
+
+obj/button.o: src/UTILS/button.cpp include/UTILS/Button.hpp include/UTILS/Math.hpp
+	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/UTILS/button.cpp -o obj/button.o
 
 # *****************************************************
 #GAME
