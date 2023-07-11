@@ -6,6 +6,7 @@
 #define WINDOW_TITLE "JDGAME"
 
 // Keys
+#define KEYS_NUMBER 322
 #define KEYS_PRESSED 0
 #define KEYS_REPEAT 1
 

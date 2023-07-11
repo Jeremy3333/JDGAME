@@ -5,9 +5,18 @@ void keyboard(bool KEYS[2][322], SDL_Event event)
     switch (event.type)
     {
     case SDL_KEYDOWN:
-        if (KEYS[KEYS_PRESSED][event.key.keysym.sym])
-            KEYS[KEYS_REPEAT][event.key.keysym.sym] = true;
-        KEYS[KEYS_PRESSED][event.key.keysym.sym] = true;
+        std::cout << "Key pressed: " << event.key.keysym.sym << std::endl;
+        if (event.key.keysym.sym < 322)
+        {
+            exit(0);
+            if (KEYS[KEYS_PRESSED][event.key.keysym.sym])
+                KEYS[KEYS_REPEAT][event.key.keysym.sym] = true;
+            KEYS[KEYS_PRESSED][event.key.keysym.sym] = true;
+        }
+        else
+        {
+            std::cout << "Key not supported" << std::endl;
+        }
         break;
     case SDL_KEYUP:
         KEYS[KEYS_PRESSED][event.key.keysym.sym] = false;
