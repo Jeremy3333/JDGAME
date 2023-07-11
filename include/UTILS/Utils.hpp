@@ -5,10 +5,15 @@
 #define WINDOW_HEIGHT 720
 #define WINDOW_TITLE "JDGAME"
 
+// Keys
+#define KEYS_PRESSED 0
+#define KEYS_REPEAT 1
+
 // General
 
 #define STATE_START_MENU 0
 #define STATE_SETTINGS 1
+#define STATE_GAME 2
 
 // Texture
 

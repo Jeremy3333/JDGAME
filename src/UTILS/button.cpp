@@ -1,14 +1,12 @@
 #include "UTILS/Button.hpp"
 
-Button::Button(Vector2f position, Vector2f size, callback_function callback, std::string text, int textureID) : position(position), size(size), callback(callback), text(text), textureID(textureID) {}
+Button::Button(Vector2f position, Vector2f size, std::string text, int textureID) : position(position), size(size), text(text), textureID(textureID) {}
 
 Button::~Button() {}
 
 Vector2f Button::getPosition() { return position; }
 
 Vector2f Button::getSize() { return size; }
-
-void Button::launchCallback() { callback(); }
 
 std::string Button::getText() { return text; }
 

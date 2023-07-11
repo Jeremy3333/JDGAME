@@ -20,6 +20,7 @@ public:
     void setQuit(bool quit);
     bool getQuit();
 
+    void setGameState(int state);
     int getGameState();
 
     Vector2f getWindowSize();

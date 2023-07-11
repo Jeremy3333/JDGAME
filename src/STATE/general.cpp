@@ -18,6 +18,11 @@ bool General::getQuit()
     return quit;
 }
 
+void General::setGameState(int state)
+{
+    this->state = state;
+}
+
 int General::getGameState()
 {
     return state;
