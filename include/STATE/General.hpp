@@ -7,15 +7,22 @@
 class General
 {
 private:
+    bool quit;
+    int state;
+    Vector2f windowSize;
     StartMenu *startMenu;
     World *world;
-    int state;
 
 public:
     General();
     ~General();
 
+    void setQuit(bool quit);
+    bool getQuit();
+
     int getGameState();
+
+    Vector2f getWindowSize();
 
     void openStartMenu();
     StartMenu *getStartMenu();

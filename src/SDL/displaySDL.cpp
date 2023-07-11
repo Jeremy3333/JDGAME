@@ -1,88 +1,94 @@
 #include "SDL/DisplaySDL.hpp"
 
-void drawButton(SDL_Renderer *renderer, Button *button, Vector2f mousePosition)
+void keyboard(bool KEYS[], SDL_Event event)
+{
+    switch (event.type)
+    {
+    case SDL_KEYDOWN:
+        KEYS[event.key.keysym.sym] = true;
+        break;
+    case SDL_KEYUP:
+        KEYS[event.key.keysym.sym] = false;
+        break;
+    default:
+        break;
+    }
+}
+
+Vector2f percentToPixels(Vector2f percent, Vector2f windowSize)
+{
+    return Vector2f((percent.x * windowSize.x) / 100.0f, (percent.y * windowSize.y / 100.0f));
+}
+
+Vector2f pixelsToPercent(Vector2f pixels, Vector2f windowSize)
+{
+    return Vector2f((pixels.x * 100.0f) / windowSize.x, (pixels.y * 100.0f) / windowSize.y);
+}
+
+void drawWriting(SDL_Renderer *renderer, TTF_Font *font, std::string text, Vector2f position, SDL_Color color)
+{
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text.c_str(), color);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect;
+    rect.x = position.x - surface->w / 2;
+    rect.y = position.y - surface->h / 2;
+    rect.w = surface->w;
+    rect.h = surface->h;
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+}
+
+void drawButton(SDL_Renderer *renderer, Button *button, Vector2f mousePosition, Vector2f windowSize, TTF_Font *font)
 {
     SDL_Rect rect;
-    Vector2f position = button->getPosition();
-    Vector2f size = button->getSize();
+    Vector2f position = percentToPixels(button->getPosition(), windowSize);
+    Vector2f size = percentToPixels(button->getSize(), windowSize);
     rect.x = position.x;
     rect.y = position.y;
     rect.w = size.x;
     rect.h = size.y;
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    if (button->isMouseOver(mousePosition))
+    if (button->isMouseOver(pixelsToPercent(mousePosition, windowSize)))
     {
         SDL_RenderFillRect(renderer, &rect);
+        drawWriting(renderer, font, button->getText(), Vector2f(position.x + size.x / 2, position.y + size.y / 2), {0, 0, 0});
     }
     else
     {
         SDL_RenderDrawRect(renderer, &rect);
+        drawWriting(renderer, font, button->getText(), Vector2f(position.x + size.x / 2, position.y + size.y / 2), {255, 255, 255});
     }
 }
 
-void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &quit, bool &keyHeld)
+void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, StartMenu *startMenu, SDL_Event &event, bool &keyHeld, Vector2f mousePosition, const Uint32 &mouseState, Vector2f windowSize, bool KEYS[])
 {
-    while (SDL_PollEvent(&event))
+    if (mouseState == SDL_BUTTON_LEFT)
     {
-        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
+        if (startMenu->getStartButton()->isMouseOver(pixelsToPercent(mousePosition, windowSize)))
         {
-            quit = true;
+            startMenu->getStartButton()->launchCallback();
         }
-        else if (event.type == SDL_KEYDOWN)
+        else if (startMenu->getSettingsButton()->isMouseOver(pixelsToPercent(mousePosition, windowSize)))
         {
-            if (!keyHeld)
-            {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_s:
-                    general.openSettings();
-                    break;
-                }
-            }
-            keyHeld = true;
+            startMenu->getSettingsButton()->launchCallback();
         }
-        else if (event.type == SDL_KEYUP)
+        else if (startMenu->getQuitButton()->isMouseOver(pixelsToPercent(mousePosition, windowSize)))
         {
-            keyHeld = false;
+            startMenu->getQuitButton()->launchCallback();
         }
     }
 }
 
-void drawStartMenu(SDL_Renderer *renderer, TTF_Font *font, StartMenu *StartMenu)
+void drawStartMenu(SDL_Renderer *renderer, TTF_Font *font, StartMenu *StartMenu, Vector2f windowSize, Vector2f mousePosition)
 {
-    int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX, &mouseY);
-    drawButton(renderer, StartMenu->getStartButton(), Vector2f(mouseX, mouseY));
-    drawButton(renderer, StartMenu->getSettingsButton(), Vector2f(mouseX, mouseY));
-    drawButton(renderer, StartMenu->getQuitButton(), Vector2f(mouseX, mouseY));
+    drawButton(renderer, StartMenu->getStartButton(), mousePosition, windowSize, font);
+    drawButton(renderer, StartMenu->getSettingsButton(), mousePosition, windowSize, font);
+    drawButton(renderer, StartMenu->getQuitButton(), mousePosition, windowSize, font);
 }
 
-void updateSettings(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &quit, bool &keyHeld)
+void updateSettings(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &keyHeld, bool KEYS[])
 {
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
-        {
-            quit = true;
-        }
-        else if (event.type == SDL_KEYDOWN)
-        {
-            if (!keyHeld)
-            {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_s:
-                    general.openStartMenu();
-                    break;
-                }
-            }
-            keyHeld = true;
-        }
-        else if (event.type == SDL_KEYUP)
-        {
-            keyHeld = false;
-        }
-    }
 }
 
 void drawSettings(SDL_Renderer *renderer, TTF_Font *font)
@@ -101,16 +107,16 @@ void drawSettings(SDL_Renderer *renderer, TTF_Font *font)
     SDL_FreeSurface(surface);
 }
 
-void selectState(General &general, SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font, SDL_Event &event, bool &quit, bool &keyHeld)
+void selectState(General &general, SDL_Window *window, SDL_Renderer *renderer, TTF_Font *font, SDL_Event &event, bool &keyHeld, Vector2f mousePosition, const Uint32 &mouseState, bool KEYS[])
 {
     switch (general.getGameState())
     {
     case STATE_START_MENU:
-        updateStartMenu(window, renderer, general, event, quit, keyHeld);
-        drawStartMenu(renderer, font, general.getStartMenu());
+        updateStartMenu(window, renderer, general.getStartMenu(), event, keyHeld, mousePosition, mouseState, general.getWindowSize(), KEYS);
+        drawStartMenu(renderer, font, general.getStartMenu(), general.getWindowSize(), mousePosition);
         break;
     case STATE_SETTINGS:
-        updateSettings(window, renderer, general, event, quit, keyHeld);
+        updateSettings(window, renderer, general, event, keyHeld, KEYS);
         drawSettings(renderer, font);
         break;
     }
@@ -121,19 +127,30 @@ void loop(SDL_Window *window, SDL_Renderer *renderer)
     SDL_Event event;
     General general;
     TTF_Font *font = TTF_OpenFont("assets/font/Minecraft.ttf", 24);
-    bool quit = false;
     bool keyHeld = false;
     float deltaTime = 0.0f;
-    while (!quit)
+    bool KEYS[322] = {false};
+    while (!general.getQuit())
     {
         float newTime = SDL_GetTicks();
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                general.setQuit(true);
+            }
+            keyboard(KEYS, event);
+        }
 
-        selectState(general, window, renderer, font, event, quit, keyHeld);
+        int mouseX, mouseY;
+        Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
+        selectState(general, window, renderer, font, event, keyHeld, Vector2f(mouseX, mouseY), mouseState, KEYS);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderPresent(renderer);
-        deltaTime = (newTime - SDL_GetTicks()) / 1000.0f;
+        deltaTime = (SDL_GetTicks() - newTime) / 1000.0f;
         if (deltaTime < 1.0f / 60.0f)
         {
             SDL_Delay((1.0f / 60.0f - deltaTime) * 1000.0f);
@@ -161,14 +178,14 @@ void Init()
         return;
     }
 
-    SDL_Window *window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         return;
     }
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
         std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;

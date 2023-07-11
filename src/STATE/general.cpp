@@ -1,6 +1,6 @@
 #include "STATE/General.hpp"
 
-General::General() : startMenu(new StartMenu()), world(nullptr), state(STATE_START_MENU) {}
+General::General() : quit(false), state(STATE_START_MENU), windowSize(Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT)), startMenu(new StartMenu()), world(nullptr) {}
 
 General::~General()
 {
@@ -8,9 +8,24 @@ General::~General()
         delete world;
 }
 
+void General::setQuit(bool quit)
+{
+    this->quit = quit;
+}
+
+bool General::getQuit()
+{
+    return quit;
+}
+
 int General::getGameState()
 {
     return state;
+}
+
+Vector2f General::getWindowSize()
+{
+    return windowSize;
 }
 
 void General::openStartMenu()
