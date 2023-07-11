@@ -12,10 +12,11 @@ private:
     Vector2f position;
     Vector2f size;
     std::string text;
+    bool textAlignmentCenter;
     int textureID;
 
 public:
-    Button(Vector2f position, Vector2f size, std::string text, int textureID);
+    Button(Vector2f position, Vector2f size, std::string text, bool textAlignmentCenter, int textureID);
     ~Button();
 
     Vector2f getPosition();
@@ -23,6 +24,8 @@ public:
     Vector2f getSize();
 
     std::string getText();
+
+    bool isTextAlignmentCenter();
 
     int getTextureID();
 
