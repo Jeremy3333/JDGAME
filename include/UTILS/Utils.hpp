@@ -9,6 +9,18 @@
 #define KEYS_NUMBER 322
 #define KEYS_PRESSED 0
 #define KEYS_REPEAT 1
+// Keys
+#define KEYS_COUNT 5
+#define KEY_UP 0
+#define DEFAULT_KEY_UP SDLK_UP
+#define KEY_DOWN 1
+#define DEFAULT_KEY_DOWN SDLK_DOWN
+#define KEY_LEFT 2
+#define DEFAULT_KEY_LEFT SDLK_LEFT
+#define KEY_RIGHT 3
+#define DEFAULT_KEY_RIGHT SDLK_RIGHT
+#define KEY_CANCEL 4
+#define DEFAULT_KEY_CANCEL SDLK_ESCAPE
 
 // Texture
 #define TEXTURE_COUNT 1

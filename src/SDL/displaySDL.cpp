@@ -1,32 +1,5 @@
 #include "SDL/DisplaySDL.hpp"
 
-void keyboard(bool KEYS[2][322], SDL_Event event)
-{
-    switch (event.type)
-    {
-    case SDL_KEYDOWN:
-        std::cout << "Key pressed: " << event.key.keysym.sym << std::endl;
-        if (event.key.keysym.sym < 322)
-        {
-            exit(0);
-            if (KEYS[KEYS_PRESSED][event.key.keysym.sym])
-                KEYS[KEYS_REPEAT][event.key.keysym.sym] = true;
-            KEYS[KEYS_PRESSED][event.key.keysym.sym] = true;
-        }
-        else
-        {
-            std::cout << "Key not supported" << std::endl;
-        }
-        break;
-    case SDL_KEYUP:
-        KEYS[KEYS_PRESSED][event.key.keysym.sym] = false;
-        KEYS[KEYS_REPEAT][event.key.keysym.sym] = false;
-        break;
-    default:
-        break;
-    }
-}
-
 SDL_Texture *loadTexture(SDL_Renderer *renderer, std::string path)
 {
     SDL_Surface *surface = IMG_Load(path.c_str());
@@ -133,12 +106,12 @@ void drawButton(SDL_Renderer *renderer, SDL_Texture *textures[TEXTURE_COUNT], TT
         chooseTexture(renderer, textures[button->getTextureID()], texturePosition, textureDimention);
 }
 
-void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &keyHeld, Vector2f mousePosition, const Uint32 &mouseState, Vector2f windowSize, bool KEYS[2][322])
+void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, General &general, Event &event, Vector2f mousePosition, const Uint32 &mouseState, Vector2f windowSize)
 {
-    if (KEYS[KEYS_PRESSED][SDLK_ESCAPE] && !KEYS[KEYS_REPEAT][SDLK_ESCAPE])
+    if (event.isKeyPressed(KEY_CANCEL) && !event.isKeyRepeat(KEY_CANCEL))
     {
-        general.setQuit(true);
-        KEYS[KEYS_REPEAT][SDLK_ESCAPE] = true;
+        event.setQuit(true);
+        event.setKeyRepeat(KEY_CANCEL, true);
     }
     if (mouseState == SDL_BUTTON_LEFT)
     {
@@ -152,7 +125,7 @@ void updateStartMenu(SDL_Window *window, SDL_Renderer *renderer, General &genera
         }
         else if (general.getStartMenu()->getQuitButton()->isMouseOver(pixelsToPercent(mousePosition, windowSize)))
         {
-            general.setQuit(true);
+            event.setQuit(true);
         }
     }
 }
@@ -164,12 +137,12 @@ void drawStartMenu(SDL_Renderer *renderer, SDL_Texture *textures[TEXTURE_COUNT],
     drawButton(renderer, textures, font, StartMenu->getQuitButton(), mousePosition, windowSize);
 }
 
-void updateSettings(SDL_Window *window, SDL_Renderer *renderer, General &general, SDL_Event &event, bool &keyHeld, bool KEYS[2][322])
+void updateSettings(SDL_Window *window, SDL_Renderer *renderer, General &general, Event &event)
 {
-    if (KEYS[KEYS_PRESSED][SDLK_ESCAPE] && !KEYS[KEYS_REPEAT][SDLK_ESCAPE])
+    if (event.isKeyPressed(KEY_CANCEL) && !event.isKeyRepeat(KEY_CANCEL))
     {
         general.setGameState(STATE_START_MENU);
-        KEYS[KEYS_REPEAT][SDLK_ESCAPE] = true;
+        event.setKeyRepeat(KEY_CANCEL, true);
     }
 }
 
@@ -189,16 +162,17 @@ void drawSettings(SDL_Renderer *renderer, SDL_Texture *textures[TEXTURE_COUNT], 
     SDL_FreeSurface(surface);
 }
 
-void selectState(General &general, SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *textures[TEXTURE_COUNT], TTF_Font *font, SDL_Event &event, bool &keyHeld, Vector2f mousePosition, const Uint32 &mouseState, bool KEYS[2][322])
+void selectState(General &general, SDL_Window *window, SDL_Renderer *renderer, SDL_Texture *textures[TEXTURE_COUNT], TTF_Font *font, Event &event, bool &keyHeld, Vector2f mousePosition, const Uint32 &mouseState)
 {
+    event.update();
     switch (general.getGameState())
     {
     case STATE_START_MENU:
-        updateStartMenu(window, renderer, general, event, keyHeld, mousePosition, mouseState, general.getWindowSize(), KEYS);
+        updateStartMenu(window, renderer, general, event, mousePosition, mouseState, general.getWindowSize());
         drawStartMenu(renderer, textures, font, general.getStartMenu(), general.getWindowSize(), mousePosition);
         break;
     case STATE_SETTINGS:
-        updateSettings(window, renderer, general, event, keyHeld, KEYS);
+        updateSettings(window, renderer, general, event);
         drawSettings(renderer, textures, font);
         break;
     }
@@ -206,31 +180,22 @@ void selectState(General &general, SDL_Window *window, SDL_Renderer *renderer, S
 
 void loop(SDL_Window *window, SDL_Renderer *renderer)
 {
-    SDL_Event event;
+    Event event;
     General general;
     TTF_Font *font = TTF_OpenFont("assets/font/Minecraft.ttf", 24);
     bool keyHeld = false;
     float deltaTime = 0.0f;
-    bool KEYS[2][322] = {false};
     SDL_Texture *textures[TEXTURE_COUNT];
     loadTextures(renderer, textures);
-    while (!general.getQuit())
+    while (!event.isQuit())
     {
         float newTime = SDL_GetTicks();
         SDL_RenderClear(renderer);
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                general.setQuit(true);
-            }
-            keyboard(KEYS, event);
-        }
 
         int mouseX, mouseY;
         Uint32 mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
-        selectState(general, window, renderer, textures, font, event, keyHeld, Vector2f(mouseX, mouseY), mouseState, KEYS);
+        selectState(general, window, renderer, textures, font, event, keyHeld, Vector2f(mouseX, mouseY), mouseState);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderPresent(renderer);

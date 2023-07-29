@@ -15,8 +15,8 @@ TARGET = bin/program.exe
 
 all: $(TARGET)
 
-$(TARGET): obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o
-	$(CC) $(CFLAGS) $(WINDOWFLAG) $(SDLDLL) $(SDLLIB) $(SDLFLAGS) $(INCLUDES) obj/main.o obj/displaySDL.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o -o $(TARGET)
+$(TARGET): obj/main.o obj/displaySDL.o obj/event.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o
+	$(CC) $(CFLAGS) $(WINDOWFLAG) $(SDLDLL) $(SDLLIB) $(SDLFLAGS) $(INCLUDES) obj/main.o obj/displaySDL.o obj/event.o obj/general.o obj/math.o obj/player.o obj/world.o obj/startMenu.o obj/button.o -o $(TARGET)
 
 # *****************************************************
 #main
@@ -27,8 +27,11 @@ obj/main.o: src/main.cpp include/SDL/DisplaySDL.hpp
 # *****************************************************
 #SDL
 
-obj/displaySDL.o: src/SDL/displaySDL.cpp include/SDL/DisplaySDL.hpp include/STATE/General.hpp include/UTILS/Utils.hpp
+obj/displaySDL.o: src/SDL/displaySDL.cpp include/SDL/DisplaySDL.hpp include/STATE/General.hpp include/UTILS/Utils.hpp include/SDL/Event.hpp
 	$(CC) $(CFLAGS) $(WINDOWFLAG) $(SDLDLL) $(SDLFLAGS) $(INCLUDES) -c src/SDL/displaySDL.cpp -o obj/displaySDL.o
+
+obj/event.o: src/SDL/event.cpp include/SDL/Event.hpp include/UTILS/Utils.hpp
+	$(CC) $(CFLAGS) $(WINDOWFLAG) $(INCLUDES) -c src/SDL/event.cpp -o obj/event.o
 
 # *****************************************************
 #STATE
